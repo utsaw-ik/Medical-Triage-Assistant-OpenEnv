@@ -1,5 +1,5 @@
 """
-Inference Script — Medical Triage Assistant OpenEnv
+Inference Script — Medical Triage Assistant OpenEnv 
 =====================================================
 MANDATORY environment variables:
   API_BASE_URL   The API endpoint for the LLM  (default: HF router)
