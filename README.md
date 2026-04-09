@@ -1,4 +1,4 @@
-# 🏥 Medical Triage Assistant — OpenEnv
+# 🏥 Medical Triage Assistant — OpenEnv 
 
 > A non-diagnostic medical triage environment for evaluating AI agents on
 > real-world clinical triage workflows.
