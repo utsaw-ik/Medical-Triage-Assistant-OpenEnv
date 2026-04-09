@@ -1,0 +1,103 @@
+name: medical-triage-env
+version: "1.0.0"
+description: >
+  A non-diagnostic medical triage environment where an AI agent learns to
+  perform real-world clinical triage workflows: ESI level assignment,
+  structured patient intake interviews, and dynamic multi-patient queue
+  management. No medical diagnosis is made — the agent performs the
+  administrative and routing triage tasks carried out by ED triage nurses.
+
+author: "OpenEnv Hackathon Submission"
+license: MIT
+
+tags:
+  - openenv
+  - medical
+  - triage
+  - healthcare
+  - real-world
+  - emergency-department
+
+tasks:
+  - name: esi_assignment
+    difficulty: easy
+    description: >
+      Assign the correct Emergency Severity Index (ESI) triage level (1–5)
+      to a patient given their chief complaint and vital signs.
+    max_steps: 3
+    reward_range: [0.0, 1.0]
+    actions:
+      - assign_level:<1-5>
+      - request_vitals
+      - request_history
+
+  - name: intake_interview
+    difficulty: medium
+    description: >
+      Conduct a structured patient intake interview by asking relevant
+      questions in an appropriate order. Collect all required fields
+      (pain_scale, onset, duration, location, associated_symptoms,
+      medical_history, current_medications, allergies, last_meal)
+      efficiently before calling complete_intake.
+    max_steps: 20
+    reward_range: [0.0, 1.0]
+    actions:
+      - ask_field:<field_name>
+      - complete_intake
+
+  - name: queue_management
+    difficulty: hard
+    description: >
+      Manage a dynamic queue of 5 waiting patients by submitting a
+      prioritized ordering (most urgent first). Mid-episode a patient
+      condition change requires the agent to reprioritize appropriately.
+    max_steps: 8
+    reward_range: [0.0, 1.0]
+    actions:
+      - submit_queue:<comma-separated-patient-ids>
+      - get_details:<patient_id>
+      - escalate:<patient_id>
+
+observation_space:
+  type: structured
+  schema: TriageObservation (Pydantic)
+  fields:
+    task_type: "str — which of the three tasks is active"
+    patient: "Patient | null — single patient object (ESI/intake tasks)"
+    queue: "List[Patient] | null — patient queue (queue task)"
+    conversation_history: "List[{role, content}] — intake dialogue so far"
+    available_actions: "List[str] — valid actions for current step"
+    step_number: "int — current step within the episode"
+    message: "str — narrative description of current state"
+    done: "bool — whether the episode has ended"
+
+action_space:
+  type: structured
+  schema: TriageAction (Pydantic)
+  fields:
+    action_type: "str — one of the task-specific action types"
+    content: "str — action payload (level number, field name, ordered IDs)"
+    target_patient_id: "str | null — optional patient selector"
+
+reward_function:
+  type: dense
+  description: >
+    Rewards are emitted at each step to provide learning signal throughout
+    the episode trajectory.
+    - ESI Assignment: +1.0 exact, +0.5 one-off, +0.2 two-off, 0.0 otherwise.
+                      -0.05 for invalid actions.
+    - Intake Interview: +0.07 per new field collected, -0.05 for repeats or
+                        invalid actions. Full graded score emitted on complete_intake.
+    - Queue Management: +0.3 × partial_score per valid queue submission,
+                        +0.05 for appropriate escalation, full score on episode end.
+
+endpoints:
+  reset: "POST /reset"
+  step:  "POST /step"
+  state: "GET  /state"
+  tasks: "GET  /tasks"
+
+deployment:
+  platform: huggingface-spaces
+  framework: docker
+  port: 7860

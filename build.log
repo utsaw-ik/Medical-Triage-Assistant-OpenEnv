@@ -1,0 +1,58 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 663B done
+#1 DONE 0.0s
+
+#2 [auth] library/python:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.11-slim
+#3 DONE 1.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [ 1/11] FROM docker.io/library/python:3.11-slim@sha256:b1b81d67b8df73bf6067191790c233ef9e598b863fc1ccf447956138ca466d99
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 201B done
+#6 DONE 0.0s
+
+#7 [ 2/11] RUN useradd -m -u 1000 appuser
+#7 CACHED
+
+#8 [10/11] COPY README.md .
+#8 CACHED
+
+#9 [ 6/11] COPY medical_triage_env.py .
+#9 CACHED
+
+#10 [ 7/11] COPY server.py .
+#10 CACHED
+
+#11 [ 8/11] COPY inference.py .
+#11 CACHED
+
+#12 [ 4/11] COPY requirements.txt .
+#12 CACHED
+
+#13 [ 9/11] COPY openenv.yaml .
+#13 CACHED
+
+#14 [ 3/11] WORKDIR /app
+#14 CACHED
+
+#15 [ 5/11] RUN pip install --no-cache-dir -r requirements.txt
+#15 CACHED
+
+#16 [11/11] RUN chown -R appuser:appuser /app
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 writing image sha256:2225cc6d24cc35c6a4c647e7bc9cf3598cdb38f3047ddf178c67677a05bc202a done
+#17 naming to docker.io/library/medical-triage-env:test done
+#17 DONE 0.0s
